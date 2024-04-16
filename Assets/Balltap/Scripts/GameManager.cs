@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using System;
 
 namespace Balltap
 {
@@ -11,6 +14,16 @@ namespace Balltap
         public GameObject startbutton;
         public GameObject reStartButton;
         public bool isGameStart;
+        public bool isConnectedWithPlayServives;
+        public int topscore;
+        [NonSerialized] public string plaeyrDataPlayerPrf = "PlayerTopScore";
+
+        private void Awake()
+        {
+            PlayGamesPlatform.DebugLogEnabled=true;
+            PlayGamesPlatform.Activate();
+        }
+
         // Start is called before the first frame update
         void Start()
         {
@@ -29,9 +42,7 @@ namespace Balltap
         }
         public void LoadHome()
         {
-            SceneManager.LoadScene("SceneManager");
+            SceneManager.LoadScene("Ball Tap");
         }
-
-
     }
 }
