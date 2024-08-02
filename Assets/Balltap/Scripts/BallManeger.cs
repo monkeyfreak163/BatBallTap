@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using System.Runtime.InteropServices;
 //using Interhaptics.Platforms.Mobile;
 //using Interhaptics
 
@@ -15,30 +16,28 @@ namespace Balltap
         public GameObject bat;
         public Rigidbody rb;
         public float speed;
-        public float ineSpeed;
-        public Vector3 ballStartPosition;
-        public Vector3 batStartPosition;
-        public int ballTapCount;
-        public int TopScore;
-        public Text ballTapCountText;
-        public Text ballTapCountResultText;
-        public Text TopScoreText;
-        public float maxSpeed;
-        public float batMinimumForce = 10;
+        [SerializeField] private float ineSpeed;
+        [SerializeField] private Vector3 ballStartPosition;
+        [SerializeField] private Vector3 batStartPosition;
+        [SerializeField] private int ballTapCount;
+        [SerializeField] private int TopScore;
+        [SerializeField] private Text ballTapCountText;
+        [SerializeField] private Text ballTapCountResultText;
+        [SerializeField] private Text TopScoreText;
+        [SerializeField] private float maxSpeed;
+        [SerializeField] private float batMinimumForce = 10;
         public Vector3 velocityChange;
-        public bool isBallEnter;
-        public GameObject[] sideBoxs;
-        public bool isFirstTime = false;
+        [SerializeField] private bool isBallEnter;
+        [SerializeField] private GameObject[] sideBoxs;
+        [SerializeField] private bool isFirstTime = false;
 
-        public Transform _targetPosition;
-        public Vector3 _offset;
-        public Transform _ui;
+        [SerializeField] private Transform _targetPosition;
+        [SerializeField] private Vector3 _offset;
+        [SerializeField] private Transform _ui;
         Camera _camera;
-        public GameObject bounusStar;
-        public GameObject starPrefab;
+        [SerializeField] private GameObject bounusStar;
+        [SerializeField] private GameObject starPrefab;
 
-        public readonly UnityEvent onTap = new UnityEvent();
-        //public MobileHapticsVibration vibration;
         // Start is called before the first frame update
         private void Awake()
         {
@@ -56,7 +55,11 @@ namespace Balltap
             Physics.gravity = new Vector3(0, -60, 0);
             //vibration = new Interhaptics.Platforms.Mobile.MobileHapticsVibration();
             _camera = Camera.main;
-
+            if (PlayerPrefs.HasKey(GameManager.Instance.plaeyrDataPlayerPrf))
+            {
+                TopScore = PlayerPrefs.GetInt(GameManager.Instance.plaeyrDataPlayerPrf, 0);
+                Debug.Log(TopScore + "Saved Score");
+            }
             
         }
         void OnCollisionEnter(Collision collision)
@@ -111,7 +114,7 @@ namespace Balltap
             }
             else if (collision.gameObject.CompareTag("ground"))
             {
-                StartCoroutine(RestartPostion());
+                StartCoroutine(ResetPostion());
             }
         }
 
@@ -149,20 +152,30 @@ namespace Balltap
         {
             isBallEnter = true;
         }
-        IEnumerator RestartPostion()
+        IEnumerator ResetPostion()
         {
             yield return new WaitForSeconds(0.2f);
             GameManager.Instance.reStartButton.SetActive(true);
             ballTapCountResultText.text = ballTapCount.ToString();
-            if(ballTapCount>TopScore)
+            
+            if (ballTapCount > TopScore)
             {
                 TopScore = ballTapCount;
                 TopScoreText.text = TopScore.ToString();
-            }
-            //else
-            //{
 
-            //}
+                GameManager.Instance.topscore = TopScore;
+                PlayerPrefs.SetInt(GameManager.Instance.plaeyrDataPlayerPrf, TopScore);
+            }
+            if (GameManager.Instance.isConnectedWithPlayServives)
+            {
+                Social.ReportScore(GameManager.Instance.topscore, GPGSIds.leaderboard_ball_tap, LeaderBoardUpdate);
+            }
+        }
+        void LeaderBoardUpdate(bool success)
+        {
+            if(success) { Debug.Log("update LeaderBoard"); }
+            else { Debug.Log("Unable to update leaderboard");}
+
         }
 
         IEnumerator Restart()

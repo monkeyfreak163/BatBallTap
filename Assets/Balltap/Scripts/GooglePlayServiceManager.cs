@@ -4,11 +4,20 @@ using UnityEngine;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using UnityEngine.UI;
+using UnityEngine.SocialPlatforms;
+using Balltap;
 
 public class GooglePlayServiceManager : MonoBehaviour
 {
     public Image GPSUserProfilePic;
     public Text GPSUserProfileName;
+    public static GooglePlayServiceManager instance;
+
+    private void Awake()
+    {
+        if(instance == null)
+            instance = this;
+    }
     void Start()
     {
         SignIn();
@@ -23,14 +32,18 @@ public class GooglePlayServiceManager : MonoBehaviour
         if (status == SignInStatus.Success)
         {
             // Continue with Play Games Services
+            Debug.Log("Login Success");
             StartCoroutine(LocalImage());
             GPSUserProfileName.text = Social.localUser.userName;
+
+            GameManager.Instance.isConnectedWithPlayServives=true;
         }
         else
         {
             // Disable your integration with Play Games Services or show a login button
             // to ask users to sign-in. Clicking it should call
-            // PlayGamesPlatform.Instance.ManuallyAuthenticate(ProcessAuthentication).
+            //PlayGamesPlatform.Instance.ManuallyAuthenticate(ProcessAuthentication);
+            Debug.Log("login Faild");
         }
     }
 
@@ -45,6 +58,10 @@ public class GooglePlayServiceManager : MonoBehaviour
         Debug.Log("Image Found");
         texture=Social.localUser.image;
         GPSUserProfilePic.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0f, 0f));
+    }
+    public void ShowLeaderBoard()
+    {
+        Social.ShowLeaderboardUI();
     }
 
 }
