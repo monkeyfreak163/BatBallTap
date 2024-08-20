@@ -20,8 +20,8 @@ namespace Balltap
 
         private void Awake()
         {
-            PlayGamesPlatform.DebugLogEnabled=true;
-            PlayGamesPlatform.Activate();
+            //PlayGamesPlatform.DebugLogEnabled=true;
+            //PlayGamesPlatform.Activate();
         }
 
         // Start is called before the first frame update

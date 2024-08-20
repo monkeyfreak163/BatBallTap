@@ -20,11 +20,11 @@ public class GooglePlayServiceManager : MonoBehaviour
     }
     void Start()
     {
-        SignIn();
+        //SignIn();
     }
     public void SignIn()
     {
-        PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+       // PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
     }
 
     internal void ProcessAuthentication(SignInStatus status)
