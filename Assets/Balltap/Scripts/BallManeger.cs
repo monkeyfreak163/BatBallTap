@@ -38,6 +38,8 @@ namespace Balltap
         [SerializeField] private GameObject bounusStar;
         [SerializeField] private GameObject starPrefab;
 
+        private LeaderBoardManager leaderBoard;
+
         // Start is called before the first frame update
         private void Awake()
         {
@@ -60,7 +62,7 @@ namespace Balltap
                 TopScore = PlayerPrefs.GetInt(GameManager.Instance.plaeyrDataPlayerPrf, 0);
                 Debug.Log(TopScore + "Saved Score");
             }
-            
+            leaderBoard = FindObjectOfType<LeaderBoardManager>();
         }
         void OnCollisionEnter(Collision collision)
         {
@@ -156,8 +158,17 @@ namespace Balltap
         {
             yield return new WaitForSeconds(0.2f);
             GameManager.Instance.reStartButton.SetActive(true);
+            UpdateScore();
+            if (GameManager.Instance.isConnectedWithPlayServives)
+            {
+                Social.ReportScore(GameManager.Instance.topscore, GPGSIds.leaderboard_ball_tap, LeaderBoardUpdate);
+            }
+        }
+        void UpdateScore()
+        {
             ballTapCountResultText.text = ballTapCount.ToString();
-            
+
+
             if (ballTapCount > TopScore)
             {
                 TopScore = ballTapCount;
@@ -165,10 +176,7 @@ namespace Balltap
 
                 GameManager.Instance.topscore = TopScore;
                 PlayerPrefs.SetInt(GameManager.Instance.plaeyrDataPlayerPrf, TopScore);
-            }
-            if (GameManager.Instance.isConnectedWithPlayServives)
-            {
-                Social.ReportScore(GameManager.Instance.topscore, GPGSIds.leaderboard_ball_tap, LeaderBoardUpdate);
+                leaderBoard.SetEntries(PlayerPrefs.GetString("UserName"),Mathf.RoundToInt(TopScore));
             }
         }
         void LeaderBoardUpdate(bool success)
